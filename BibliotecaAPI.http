@@ -1,0 +1,100 @@
+using Microsoft.AspNetCore.Mvc;
+
+namespace BibliotecaAPI.Controllers
+{
+    [ApiController]
+    [Route("api/[controller]")]
+    public class BooksController : ControllerBase
+    {
+        private static List<Book> books = new List<Book>
+        {
+            new Book
+            {
+                Id = 1,
+                Title = "Clean Code",
+                Author = "Robert Martin",
+                Genre = "Programming",
+                Year = 2008,
+                Quantity = 5
+            }
+        };
+
+        [HttpGet]
+        public IActionResult GetBooks()
+        {
+            return Ok(books);
+        }
+
+        [HttpGet("{id}")]
+        public IActionResult GetBookById(int id)
+        {
+            var book = books.FirstOrDefault(x => x.Id == id);
+
+            if (book == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(book);
+        }
+
+        [HttpPost]
+        public IActionResult CreateBook(Book book)
+        {
+            book.Id = books.Max(x => x.Id) + 1;
+
+            books.Add(book);
+
+            return CreatedAtAction(nameof(GetBookById), new { id = book.Id }, book);
+        }
+
+        [HttpPut("{id}")]
+        public IActionResult UpdateBook(int id, Book updatedBook)
+        {
+            var book = books.FirstOrDefault(x => x.Id == id);
+
+            if (book == null)
+            {
+                return NotFound();
+            }
+
+            book.Title = updatedBook.Title;
+            book.Author = updatedBook.Author;
+            book.Genre = updatedBook.Genre;
+            book.Year = updatedBook.Year;
+            book.Quantity = updatedBook.Quantity;
+
+            return NoContent();
+        }
+
+        [HttpDelete("{id}")]
+        public IActionResult DeleteBook(int id)
+        {
+            var book = books.FirstOrDefault(x => x.Id == id);
+
+            if (book == null)
+            {
+                return NotFound();
+            }
+
+            books.Remove(book);
+
+            return NoContent();
+        }
+    }
+
+    public class Book
+    {
+        public int Id { get; set; }
+
+        public string Title { get; set; } = "";
+
+        public string Author { get; set; } = "";
+
+        public string Genre { get; set; } = "";
+
+        public int Year { get; set; }
+
+        public int Quantity { get; set; }
+    }
+}
